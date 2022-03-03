@@ -6,7 +6,7 @@ const MaySelect = ({ oprions, defoltValue, value, onChange }) => {
             value={value}
             onChange={event => onChange(event.target.value)}
         >
-            <option disabled value="1">{defoltValue}</option>
+            <option disabled value="">{defoltValue}</option>
             {oprions.map(opti =>
                 <option key={opti.value} value={opti.value}>
                     {opti.name}
