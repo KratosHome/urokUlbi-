@@ -1,9 +1,11 @@
 import React, { useMemo, useRef, useState } from "react";
+import Postfilter from "./components/PostFilter";
 import Postform from "./components/postForm";
 import Postlist from "./components/PostList";
 import "./components/styles/app.css"
-import MyInput from "./components/UI/Input/MyInput";
-import MaySelect from "./components/UI/select/MaySelect";
+import Maybutton from "./components/UI/Button/MayButton";
+import MayModal from "./components/UI/MayModal/MayModal";
+
 
 function App() {
   const [posts, setPosts] = useState([
@@ -12,61 +14,42 @@ function App() {
     { id: 3, title: "аааа", body: "fvdfvsvfs" }
   ])
 
-  const [selectedSort, setSelectedSort] = useState("")
-  const [saerchQwery, setSearchQwery] = useState("")
-
+  const [filter, setFilter] = useState({ sort: "", query: "" })
+  const [modal, setModal] = useState(false)
 
   const sortedPost = useMemo(() => {
-    console.log("fvfvsdf")
-    if (selectedSort) {
-      return [...posts].sort((a, b) => a[selectedSort].localeCompare(b[selectedSort]))
+    if (filter.sort) {
+      return [...posts].sort((a, b) => a[filter.sort].localeCompare(b[filter.sort]))
     } else {
       return posts
     }
-  }, [selectedSort, posts])
+  }, [filter.sort, posts])
 
   const sortedAndSearchedPosts = useMemo(() => {
-    return sortedPost.filter(posts => posts.title.toLocaleUpperCase().includes(saerchQwery.toLocaleUpperCase()))
-  }, [saerchQwery,sortedPost])
+    return sortedPost.filter(posts => posts.title.toLocaleUpperCase().includes(filter.query.toLocaleUpperCase()))
+  }, [filter.query, sortedPost])
 
   const createPost = (newPost) => {
     setPosts([...posts, newPost])
+    setModal(false)
   }
 
   const remuvePost = (post) => {
     setPosts(posts.filter(p => p.id !== post.id))
   }
 
-  const sortPost = (sort) => {
-    setSelectedSort(sort)
-  }
-
-
   return (
     <div className="App">
-      <Postform
-        create={createPost}
-      />
+      <Maybutton style={{marginTop: 30}} onClick={() => setModal(true)}>
+        Создать пользователя
+      </Maybutton>
+      <MayModal visible={modal} setVisible={setModal}>
+        <Postform create={createPost} />
+      </MayModal>
+
       <hr style={{ margin: "15px 0" }} />
-      <MyInput
-        value={saerchQwery}
-        onChange={e => setSearchQwery(e.target.value)}
-        placeholder='Пошук'
-      />
-      <MaySelect
-        value={selectedSort}
-        onChange={sortPost}
-        defoltValue="Сортировка"
-        oprions={[
-          { value: "title", name: "по названию" },
-          { value: "body", name: "по описанию" }
-        ]}
-      />
-      {sortedAndSearchedPosts.length !== 0
-        ? <Postlist remuve={remuvePost} posts={sortedAndSearchedPosts} title={"Список постов"} />
-        : <h1 style={{ textAlign: "center" }}>
-          Постов нету
-        </h1>}
+      <Postfilter filter={filter} setFilter={setFilter} />
+      <Postlist remuve={remuvePost} posts={sortedAndSearchedPosts} title={"Список постов"} />
     </div>
   );
 }
