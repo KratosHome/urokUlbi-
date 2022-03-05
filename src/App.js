@@ -51,7 +51,7 @@ function App() {
         <Postform create={createPost} />
       </MayModal>
 
-      <hr style={{ margin: "15px 0" }} />
+      <hr style={{ margin: "153px 0" }} />
       <Postfilter filter={filter} setFilter={setFilter} />
       {isPostsLoading
       ? <Loader/>
