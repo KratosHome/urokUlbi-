@@ -29,8 +29,6 @@ function App() {
     setPosts(posts.filter(p => p.id !== post.id))
   }
 
-
-
   async function fetchPosts(){
     setIsPostsLoading(true)
     const posts = await PostService.getAll()
@@ -50,8 +48,7 @@ function App() {
       <MayModal visible={modal} setVisible={setModal}>
         <Postform create={createPost} />
       </MayModal>
-
-      <hr style={{ margin: "153px 0" }} />
+      <hr style={{ margin: "15px 0" }} />
       <Postfilter filter={filter} setFilter={setFilter} />
       {isPostsLoading
       ? <Loader/>
