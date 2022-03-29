@@ -8,6 +8,8 @@ import "./components/styles/app.css"
 import Maybutton from "./components/UI/Button/MayButton";
 import Loader from "./components/UI/Loader/Loader";
 import MayModal from "./components/UI/MayModal/MayModal";
+import { useFetshing } from './components/hooks/useFetsing';
+import { getPageCount } from './components/utils/pages';
 
 
 function App() {
@@ -17,9 +19,20 @@ function App() {
   const [modal, setModal] = useState(false)
 
   const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query)
- 
-  const [isPostsLoading, setIsPostsLoading] = useState(false)
 
+  // Пагінація 
+  const [totalPage, setTotalPage] = useState(0)
+  const [limit, setLimit] = useState(10)
+  const [page, setPage] = useState(1)
+
+  const [fetshing, isLoading, eror] = useFetshing(async () => {
+    const response = await PostService.getAll(limit, page)
+    setPosts(response.data)
+    const totalCoint = response.headers["x-total-count"]
+    setTotalPage(getPageCount(totalCoint, limit))
+  })
+
+  console.log(totalPage)
   const createPost = (newPost) => {
     setPosts([...posts, newPost])
     setModal(false)
@@ -29,20 +42,13 @@ function App() {
     setPosts(posts.filter(p => p.id !== post.id))
   }
 
-  async function fetchPosts(){
-    setIsPostsLoading(true)
-    const posts = await PostService.getAll()
-    setPosts(posts)
-    setIsPostsLoading(false)
-  }
-
-  useEffect(()=>{
-    fetchPosts()
-  },[])
+  useEffect(() => {
+    fetshing()
+  }, [])
 
   return (
     <div className="App">
-      <Maybutton style={{marginTop: 30}} onClick={() => setModal(true)}>
+      <Maybutton style={{ marginTop: 30 }} onClick={() => setModal(true)}>
         Создать пользователя
       </Maybutton>
       <MayModal visible={modal} setVisible={setModal}>
@@ -50,9 +56,11 @@ function App() {
       </MayModal>
       <hr style={{ margin: "15px 0" }} />
       <Postfilter filter={filter} setFilter={setFilter} />
-      {isPostsLoading
-      ? <Loader/>
-      : <Postlist remuve={remuvePost} posts={sortedAndSearchedPosts} title={"Список постов"} />
+      {eror &&
+        <h1>Помилка ${eror}</h1>}
+      {isLoading
+        ? <Loader />
+        : <Postlist remuve={remuvePost} posts={sortedAndSearchedPosts} title={"Список постов"} />
       }
     </div>
   );
