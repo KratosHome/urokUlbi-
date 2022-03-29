@@ -1,77 +1,24 @@
-import React, { useEffect, useState } from "react";
-import PostService from "./components/API/PostServis";
-import { usePosts } from "./components/hooks/usePosts";
-import Postfilter from "./components/PostFilter";
-import Postform from "./components/postForm";
-import Postlist from "./components/PostList";
+import React from 'react';
 import "./components/styles/app.css"
-import Maybutton from "./components/UI/Button/MayButton";
-import Loader from "./components/UI/Loader/Loader";
-import MayModal from "./components/UI/MayModal/MayModal";
-import { useFetshing } from './components/hooks/useFetsing';
-import { getPageCount, getPagesArray } from './components/utils/pages';
-import Pagination from "./components/UI/Pagination/Pagination";
-
+import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
+import About from './components/pages/About';
+import Posts from './components/pages/Posts';
+import Navbar from './components/UI/NavBat/NavBar';
+import Notfound from './components/pages/NotFound';
 
 function App() {
-  const [posts, setPosts] = useState([])
-
-  const [filter, setFilter] = useState({ sort: "", query: "" })
-  const [modal, setModal] = useState(false)
-
-  const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query)
-
-  // Пагінація 
-  const [totalPage, setTotalPage] = useState(0)
-  const [limit, setLimit] = useState(10)
-  const [page, setPage] = useState(1)
-
-  const [fetshing, isLoading, eror] = useFetshing(async () => {
-    const response = await PostService.getAll(limit, page)
-    setPosts(response.data)
-    const totalCoint = response.headers["x-total-count"]
-    setTotalPage(getPageCount(totalCoint, limit))
-  })
-
-
-
-  const changePage = (page) => {
-    setPage(page)
-  }
-
-
-  const createPost = (newPost) => {
-    setPosts([...posts, newPost])
-    setModal(false)
-  }
-
-  const remuvePost = (post) => {
-    setPosts(posts.filter(p => p.id !== post.id))
-  }
-
-  useEffect(() => {
-    fetshing()
-  }, [page])
-
   return (
-    <div className="App">
-      <Maybutton style={{ marginTop: 30 }} onClick={() => setModal(true)}>
-        Создать пользователя
-      </Maybutton>
-      <MayModal visible={modal} setVisible={setModal}>
-        <Postform create={createPost} />
-      </MayModal>
-      <hr style={{ margin: "15px 0" }} />
-      <Postfilter filter={filter} setFilter={setFilter} />
-      {eror &&
-        <h1>Помилка ${eror}</h1>}
-      {isLoading
-        ? <Loader />
-        : <Postlist remuve={remuvePost} posts={sortedAndSearchedPosts} title={"Список постов"} />
-      }
-      <Pagination page={page} totalPage={totalPage} changePage={changePage} />
 
-    </div>
+    <BrowserRouter>
+      <Navbar />
+      <Routes>
+        <Route path="/about" element={<About />} />
+        <Route path="/posts" element={<Posts />} />
+        <Route path="*" element={<Notfound/>} />
+      </Routes>
+
+    </BrowserRouter>
+
   );
 }
 
