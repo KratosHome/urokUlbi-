@@ -9,7 +9,8 @@ import Maybutton from "./components/UI/Button/MayButton";
 import Loader from "./components/UI/Loader/Loader";
 import MayModal from "./components/UI/MayModal/MayModal";
 import { useFetshing } from './components/hooks/useFetsing';
-import { getPageCount } from './components/utils/pages';
+import { getPageCount, getPagesArray } from './components/utils/pages';
+import Pagination from "./components/UI/Pagination/Pagination";
 
 
 function App() {
@@ -32,7 +33,13 @@ function App() {
     setTotalPage(getPageCount(totalCoint, limit))
   })
 
-  console.log(totalPage)
+
+
+  const changePage = (page) => {
+    setPage(page)
+  }
+
+
   const createPost = (newPost) => {
     setPosts([...posts, newPost])
     setModal(false)
@@ -44,7 +51,7 @@ function App() {
 
   useEffect(() => {
     fetshing()
-  }, [])
+  }, [page])
 
   return (
     <div className="App">
@@ -62,6 +69,8 @@ function App() {
         ? <Loader />
         : <Postlist remuve={remuvePost} posts={sortedAndSearchedPosts} title={"Список постов"} />
       }
+      <Pagination page={page} totalPage={totalPage} changePage={changePage} />
+
     </div>
   );
 }
